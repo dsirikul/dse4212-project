@@ -1,9 +1,9 @@
 import yfinance as yf
 import pandas as pd
 import numpy as np
-import datetime
+import os  # For file path management
 import pandas_ta as ta  # Import pandas-ta for technical indicators
-from sklearn.preprocessing import StandardScaler  # For standardization
+from sklearn.metrics import mean_absolute_error, mean_squared_error  # For evaluating forecast
 from statsmodels.tsa.stattools import adfuller  # Import ADF test
 from arch.unitroot import DFGLS  # Import DFGLS test (corrected)
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf  # For ACF and PACF plotting
@@ -16,6 +16,13 @@ tickers = ["LLY", "ABBV", "JNJ", "MRK", "TMO", "UNH"]
 # Define the start and end dates
 start_date = '2014-09-01'
 end_date = '2024-09-01'
+
+# Define the folder path for saving CSV files
+data_folder = os.path.join(os.getcwd(), 'data')
+
+# Create the folder if it doesn't exist
+if not os.path.exists(data_folder):
+    os.makedirs(data_folder)
 
 # Function to check stationarity using ADF and DFGLS
 def check_stationarity(series, name=""):
@@ -31,8 +38,7 @@ def check_stationarity(series, name=""):
     # DFGLS Test
     dfgls_result = DFGLS(series).stat
     print(f"DFGLS Test Statistic for {name}: {dfgls_result}")
-    # DFGLS doesn’t return p-values directly, so interpret the stat value.
-    if dfgls_result < -2.86:  # This is a commonly used critical value threshold for stationarity.
+    if dfgls_result < -2.86:
         print(f"The series '{name}' is stationary based on the DFGLS test.")
     else:
         print(f"The series '{name}' is NOT stationary based on the DFGLS test.")
@@ -46,7 +52,7 @@ for ticker in tickers:
     hist = yf.download(ticker, start=start_date, end=end_date)
 
     # Save the raw data to a CSV file before any processing
-    raw_csv_filename = f"{ticker}_raw_data.csv"
+    raw_csv_filename = os.path.join(data_folder, f"{ticker}_raw_data.csv")
     hist.to_csv(raw_csv_filename)
     print(f"Raw data for {ticker} saved to '{raw_csv_filename}'")
 
@@ -94,13 +100,43 @@ for ticker in tickers:
     hist.index = pd.to_datetime(hist.index)
     hist = hist.asfreq('B')  # 'B' stands for business days
 
-    # Fit ARIMA model (p=1, d=1, q=1 based on the plots)
-    print(f"Fitting ARIMA model for {ticker} (p=1, d=1, q=1)...")
-    model = ARIMA(hist['Close'], order=(1, 1, 1))  # ARIMA(1,1,1)
+    # Train-test split (80% train, 20% test)
+    split_point = int(len(hist) * 0.8)
+    train_data = hist['Close'][:split_point]
+    test_data = hist['Close'][split_point:]
+
+    # Drop NaN values from train and test sets (if any)
+    train_data = train_data.dropna()
+    test_data = test_data.dropna()
+
+    # Fit ARIMA model on training data (p=1, d=1, q=1 based on the plots)
+    print(f"Fitting ARIMA model for {ticker} (p=1, d=1, q=1) on training data...")
+    model = ARIMA(train_data, order=(1, 1, 1))
     arima_result = model.fit()
 
     # Print ARIMA model summary
     print(arima_result.summary())
+
+    # Forecast the values for the test set
+    forecast = arima_result.forecast(steps=len(test_data))
+
+    # Drop NaN values in the forecast and test_data (to align shapes)
+    forecast = forecast.dropna()
+    test_data = test_data[:len(forecast)]
+
+    # Plot actual vs forecasted values
+    plt.figure(figsize=(10, 6))
+    plt.plot(test_data.index, test_data, label='Actual Close Prices', color='blue')
+    plt.plot(test_data.index, forecast, label='Forecasted Close Prices', color='red')
+    plt.title(f'ARIMA Forecast vs Actual for {ticker}')
+    plt.legend()
+    plt.show()
+
+    # Evaluate the model performance
+    mae = mean_absolute_error(test_data, forecast)
+    rmse = np.sqrt(mean_squared_error(test_data, forecast))
+    print(f"Mean Absolute Error (MAE) for {ticker}: {mae}")
+    print(f"Root Mean Squared Error (RMSE) for {ticker}: {rmse}")
 
     # Plot the residuals to check the fit
     residuals = arima_result.resid
@@ -140,7 +176,7 @@ for ticker in tickers:
     hist['Volatility'] = hist['Daily_Return'].rolling(window=5).std()
 
     # Save the processed data to a CSV file named after the company ticker
-    processed_csv_filename = f"{ticker}_processed_data.csv"
+    processed_csv_filename = os.path.join(data_folder, f"{ticker}_processed_data.csv")
     hist.to_csv(processed_csv_filename)
 
     print(f"Processed data for {ticker} saved to '{processed_csv_filename}'.")
