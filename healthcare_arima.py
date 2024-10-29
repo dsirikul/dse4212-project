@@ -36,7 +36,6 @@ def check_stationarity(series, name=""):
 mae_list = []
 rmse_list = []
 
-# Loop through each ticker, download the data, process it, and save to CSV
 for ticker in tickers:
     print(f"\nProcessing data for {ticker}...")
 
