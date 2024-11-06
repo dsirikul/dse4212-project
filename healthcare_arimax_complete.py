@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import pandas_ta as ta
 
 # List of tickers for the six companies
-tickers = ["LLY", "ABBV", "JNJ", "MRK", "TMO", "UNH"]
+tickers = ["AAPL", "MSFT", "GOOG", "AMZN", "META", "NVDA"]
 
 # Define the start and end dates
 start_date = '2014-09-01'
