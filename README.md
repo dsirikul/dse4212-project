@@ -54,15 +54,28 @@ Model performance was evaluated based on:
 
 The data pipeline includes scripts for preprocessing, feature engineering, and training the models.
 
-## Directory Structure
+## Folder Structure
 
-- **data/**: Contains raw and processed stock data for both technology and healthcare sectors.
-- **src/**: Code files for each model type, including preprocessing steps.
-  - **CNN_raw.ipynb**: CNN model using raw variables.
-  - **LSTM_raw.ipynb**: LSTM model with raw variables.
-  - **CNN-LSTM_raw.ipynb**: Hybrid CNN-LSTM model with raw variables.
-  - **arimax_raw.ipynb**: ARIMA model with exogenous variables.
-- **annex/**: Contains full model variations with additional feature engineering.
+```
+.
+├── data/
+├── src/
+│   ├── CNN_raw.ipynb
+│   ├── LSTM_raw.ipynb
+│   ├── CNN-LSTM_raw.ipynb
+│   ├── arima_raw.ipynb
+│   └── CNN-LSTM_raw.ipynb
+├── annex/
+└── README.md
+```
+
+- `data` - Contains raw and processed stock data for both technology and healthcare sectors.
+- `src`: Code files for each model type, including preprocessing steps.
+  - `CNN_raw.ipynb`: CNN model using raw variables.
+  - `LSTM_raw.ipynb`: LSTM model with raw variables.
+  - `CNN-LSTM_raw.ipynb`: Hybrid CNN-LSTM model with raw variables.
+  - `arimax_raw.ipynb`: ARIMA model with exogenous variables.
+- `annex`: Contains full model variations with additional feature engineering.
 
 ## Results
 
