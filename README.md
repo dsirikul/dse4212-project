@@ -5,10 +5,10 @@ This repository contains code and data for the DSE4212 Group Project by Group 14
 ## Project Overview
 
 The goal of this project is to evaluate the predictive accuracy of different models, including:
-- **ARIMA** (traditional time-series model)
+- **ARIMA** (Traditional time-series model)
 - **CNN** (Convolutional Neural Network)
 - **LSTM** (Long Short-Term Memory)
-- **CNN-LSTM Hybrid** (combining CNN and LSTM)
+- **CNN-LSTM Hybrid** (Combining CNN and LSTM)
 
 The study is based on the hypothesis that neural networks, especially CNN and LSTM, can outperform ARIMA due to their ability to capture complex patterns in financial data. However, the project also considers the computational trade-offs associated with these models.
 
