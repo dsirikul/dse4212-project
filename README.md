@@ -63,8 +63,7 @@ The data pipeline includes scripts for preprocessing, feature engineering, and t
 │   ├── CNN_raw.ipynb
 │   ├── LSTM_raw.ipynb
 │   ├── CNN-LSTM_raw.ipynb
-│   ├── arima_raw.ipynb
-│   └── CNN-LSTM_raw.ipynb
+│   └── arima_raw.ipynb
 ├── annex/
 └── README.md
 ```
